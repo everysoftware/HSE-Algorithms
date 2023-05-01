@@ -1,27 +1,13 @@
-from binary_search import *
-
-
-# O(N^2)
-def rectangles_naive(n, rect, m, points):
-    result = []
-    for i in range(m):
-        k = 0
-        for j in range(n):
-            x1, y1, x2, y2 = rect[j]
-            if x1 <= points[i][0] < x2 and y1 <= points[i][1] < y2:
-                k += 1
-        result.append(k)
-    return result
+from binary_search import upper_bound
 
 
 class AlgorithmOnMap:
-    def __init__(self, n, rectangles):
+    def __init__(self, rectangles):
         self.all_x = []
         self.all_y = []
         self.compressed_x = {}
         self.compressed_y = {}
         self.map = []
-        self.rectangles_count = n
         self.rectangles = rectangles
         self.compress_rectangles()
         self.create_map()
@@ -30,15 +16,15 @@ class AlgorithmOnMap:
         mapper = self.compressed_x if mapper_type == 0 else self.compressed_y
         keys = self.all_x if mapper_type == 0 else self.all_y
         new_coord = 0
-        for i in range(len(keys)):
-            mapper[keys[i]] = new_coord
+        for key in keys:
+            mapper[key] = new_coord
             new_coord += 2
 
     def compress_rectangles(self):
         self.compressed_x, self.compressed_y = {}, {}
         self.all_x, self.all_y = [], []
-        for i in range(self.rectangles_count):
-            x1, y1, x2, y2 = self.rectangles[i]
+        for rect in self.rectangles:
+            x1, y1, x2, y2 = rect
             self.all_x += [x1, x2]
             self.all_y += [y1, y2]
         self.all_x, self.all_y = sorted(set(self.all_x)), sorted(set(self.all_y))
@@ -47,8 +33,8 @@ class AlgorithmOnMap:
 
     def create_map(self):
         self.map = [[0] * (2 * len(self.compressed_y)) for _ in range(2 * len(self.compressed_x) + 1)]
-        for i in range(self.rectangles_count):
-            x1, y1, x2, y2 = self.rectangles[i]
+        for rect in self.rectangles:
+            x1, y1, x2, y2 = rect
             compressed_lower_point = (self.compressed_x[x1], self.compressed_y[y1])
             compressed_upper_point = (self.compressed_x[x2], self.compressed_y[y2])
             for j in range(compressed_lower_point[0], compressed_upper_point[0]):
@@ -73,14 +59,11 @@ class AlgorithmOnMap:
             return 0
         return self.map[compressed_point[0]][compressed_point[1]]
 
-    def execute(self, m, points):
-        result = []
-        for i in range(m):
-            result.append(self.count(points[i]))
-        return result
+    def execute(self, points):
+        return [self.count(point) for point in points]
 
 
 # O(N^3) + O(logN)
-def rectangles_map(n, rect, m, points):
-    al = AlgorithmOnMap(n, rect)
-    return al.execute(m, points)
+def rectangles_map(rectangles, points):
+    al = AlgorithmOnMap(rectangles)
+    return al.execute(points)
