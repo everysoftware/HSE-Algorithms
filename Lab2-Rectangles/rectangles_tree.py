@@ -23,21 +23,21 @@ class Node:
                 return self.summa
             return self.summa + self.right.find_quantity(m, right, target)
 
-    def add_node(self, left, right, x, is_left):
-        if left >= x or right <= x:
+    def add_node(self, left, right, start, end, is_left):
+        if left >= end or right <= start:
             return self
         if self.left is None:
             self.left = Node()
         if self.right is None:
             self.right = Node()
-        if right <= x <= left:
+        if start <= left and right <= end:
             node = self.copy()
             node.summa += 1 if is_left else -1
             return node
         m = (left + right) // 2
         node = self.copy()
-        node.left = self.left.add_node(left, m, x, is_left)
-        node.right = self.right.add_node(m, right, x, is_left)
+        node.left = self.left.add_node(left, m, start, end, is_left)
+        node.right = self.right.add_node(m, right, start, end, is_left)
         return node
 
 
@@ -52,8 +52,7 @@ class AlgorithmOnTree:
         self.build_tree()
 
     def compress_rectangles(self):
-        for rect in self.rectangles:
-            x1, y1, x2, y2 = rect
+        for x1, y1, x2, y2 in self.rectangles:
             self.compressed_x += [x1, x2]
             self.compressed_y += [y1, y2]
         self.compressed_x = sorted(set(self.compressed_x))
@@ -62,27 +61,24 @@ class AlgorithmOnTree:
     def build_tree(self):
         root = Node()
         sides = []
-        for rect in self.rectangles:
-            x1, y1, x2, y2 = rect
+        for x1, y1, x2, y2 in self.rectangles:
+            y1_pos = lower_bound(self.compressed_y, y1)
+            y2_pos = lower_bound(self.compressed_y, y2)
             sides.append([
                 lower_bound(self.compressed_x, x1),
-                lower_bound(self.compressed_y, y1),
+                y1_pos,
+                y2_pos,
                 True
             ])
             sides.append([
                 lower_bound(self.compressed_x, x2),
-                lower_bound(self.compressed_y, y2),
+                y1_pos,
+                y2_pos,
                 False
             ])
         sides.sort(key=lambda i: i[0])
-        for side in sides:
-            x, y, is_lower = side
-            root = root.add_node(
-                0,
-                len(self.compressed_y),
-                y,
-                is_lower
-            )
+        for x, y1, y2, is_lower in sides:
+            root = root.add_node(0, len(self.compressed_y), y1, y2, is_lower)
             self.roots.append(root)
             self.compressed_roots.append(x)
 
