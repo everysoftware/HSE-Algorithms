@@ -7,8 +7,10 @@ from rectangles_tree import *
 
 X_PRIME = 113
 Y_PRIME = 131
+TEST_BASE = 2
+MAX_TEST_EXPONENT = 14
 POINTS_COUNT = 10 ** 4
-ALGORITHMS = [BruteForceAlgorithm, AlgorithmOnMap, AlgorithmOnTree]
+ALGORITHMS = {BruteForceAlgorithm: float('inf'), AlgorithmOnMap: 10, AlgorithmOnTree: float('inf')}
 RAW_DIR = 'raw'
 
 
@@ -25,13 +27,13 @@ def get_raw_data():
     print('Launching tests')
     launch_start = perf_counter()
     print(f'M = {POINTS_COUNT}')
-    for i in range(1, 6):
-        print(f'N = 10^{i}')
-        rectangles = generate_rectangles(10 ** i)
+    for i in range(1, MAX_TEST_EXPONENT):
+        print(f'N = {TEST_BASE}^{i}')
+        rectangles = generate_rectangles(TEST_BASE ** i)
         time = []
         for j, algo in enumerate(ALGORITHMS):
             res = {'preparation': 0, 'query': 0, 'sum': 0}
-            if i >= 4 and j == 1:
+            if i > ALGORITHMS[algo]:
                 print(f'Skipping algorithm #{j + 1}...')
                 time.append(res)
                 continue
@@ -47,7 +49,7 @@ def get_raw_data():
             time.append(res)
             del al  # фикс замера 1 алгоритма
             print(f'result: {res}')
-        result[f'10^{i}'] = time
+        result[f'{TEST_BASE}^{i}'] = time
     print()
     print(f'Testing done in {perf_counter() - launch_start} s.')
     return result
