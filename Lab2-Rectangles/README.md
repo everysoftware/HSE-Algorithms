@@ -13,9 +13,9 @@
 
 | Алгоритм  | Подготовка  | Временная сложность  |  Реализация
 | ------------- | ------------- | ------------- | ------------- |
-| Переборный  | O(1)  | O(N)  | src/rectangles_naive.py  |
-| На карте  | O(N^3)  | O(logN) | src/rectangles_map.py  |
-| На дереве  | O(NlogN)  |  O(logN) | src/rectangles_tree.py  |
+| Переборный  | O(1)  | O(N)  | rectangles_naive.py  |
+| На карте  | O(N^3)  | O(logN) | rectangles_map.py  |
+| На дереве  | O(NlogN)  |  O(logN) | rectangles_tree.py  |
 
 ## Графики
 
